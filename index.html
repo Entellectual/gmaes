@@ -3,78 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura Arcade</title>
+    <title>Sigma Arcade</title>
     <style>
-        :root { --galaxy-green: #00ff88; --deep-void: #020617; --nebula-glow: rgba(0, 255, 136, 0.15); }
-        body { margin: 0; background-color: var(--deep-void); color: #e2e8f0; font-family: 'Inter', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        .background-fx { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: radial-gradient(circle at 20% 30%, #064e3b 0%, transparent 40%), radial-gradient(circle at 80% 70%, #064e3b 0%, transparent 40%); filter: blur(80px); opacity: 0.4; }
-        header { text-align: center; padding: 60px 20px; }
-        h1 { font-size: 3.5rem; margin: 0; background: linear-gradient(to bottom right, #fff, var(--galaxy-green)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 15px rgba(0, 255, 136, 0.4)); }
-        .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 25px; width: 90%; max-width: 1100px; padding-bottom: 100px; }
-        .game-card { aspect-ratio: 1 / 1; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; position: relative; cursor: pointer; overflow: hidden; transition: 0.3s; display: flex; flex-direction: column; justify-content: flex-end; }
-        .game-card:hover { transform: scale(1.05); border-color: var(--galaxy-green); box-shadow: 0 0 30px var(--nebula-glow); }
-        .placeholder-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #064e3b; opacity: 0.6; }
-        .game-label { z-index: 2; background: rgba(15, 23, 42, 0.9); padding: 15px; text-align: center; color: var(--galaxy-green); font-weight: bold; border-top: 1px solid rgba(0, 255, 136, 0.2); text-transform: capitalize; }
+        :root {
+            --galaxy-green: #00ff88;
+            --deep-void: #020617;
+            --nebula-glow: rgba(0, 255, 136, 0.15);
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--deep-void);
+            color: #e2e8f0;
+            font-family: 'Inter', -apple-system, sans-serif;
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+        }
+
+        .background-fx {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: radial-gradient(circle at 20% 30%, #064e3b 0%, transparent 40%),
+                        radial-gradient(circle at 80% 70%, #064e3b 0%, transparent 40%);
+            filter: blur(80px); opacity: 0.4;
+        }
+
+        header { text-align: center; padding: 60px 20px 20px; }
+        h1 {
+            font-size: 3.5rem; margin: 0;
+            background: linear-gradient(to bottom right, #fff, var(--galaxy-green));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 15px rgba(0, 255, 136, 0.4));
+        }
+
+        .game-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 25px; width: 90%; max-width: 1200px; padding-bottom: 100px;
+        }
+
+        .game-card {
+            aspect-ratio: 1 / 1; background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px;
+            position: relative; cursor: pointer; overflow: hidden;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex; flex-direction: column; justify-content: flex-end;
+        }
+
+        .game-card:hover {
+            transform: scale(1.05); border-color: var(--galaxy-green);
+            box-shadow: 0 0 30px var(--nebula-glow);
+        }
+
+        .placeholder-img {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #064e3b; opacity: 0.6;
+        }
+
+        .game-label {
+            z-index: 2; background: rgba(15, 23, 42, 0.9); padding: 15px;
+            text-align: center; color: var(--galaxy-green); font-weight: bold;
+            text-transform: capitalize; border-top: 1px solid rgba(0, 255, 136, 0.2);
+        }
+
+        #loading { color: var(--galaxy-green); margin-top: 50px; font-weight: bold; }
     </style>
 </head>
 <body>
+
     <div class="background-fx"></div>
-    <header><h1>Aura Arcade</h1><p style="color:#94a3b8; letter-spacing:2px;">GALAXY GAMING PORTAL</p></header>
-    <main class="game-grid" id="game-grid">
-        <!-- Games will load here automatically -->
-    </main>
+
+    <header>
+        <h1>Sigma Arcade</h1>
+        <p style="color: #94a3b8; letter-spacing: 2px;">AUTOMATED GALAXY PORTAL</p>
+    </header>
+
+    <div id="loading">Scanning Nebula for Games...</div>
+    <main class="game-grid" id="grid"></main>
 
     <script>
+        // CONFIG: Replace with your details if they change
         const REPO_OWNER = 'Entellectual';
         const REPO_NAME = 'gmaes';
 
-        async function loadGames() {
-            const grid = document.getElementById('game-grid');
+        async function initArcade() {
+            const grid = document.getElementById('grid');
+            const loader = document.getElementById('loading');
+            
             try {
-                // Fetch all files/folders from the GitHub repo
-                const response = await fetch(`api.github.com{REPO_OWNER}/${REPO_NAME}/contents/`);
+                // Fetch repository contents via GitHub API
+                const response = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/`);
                 const items = await response.json();
 
-                // Filter for folders only (each folder is a game)
+                if (!Array.isArray(items)) throw new Error('Invalid repo data');
+
+                loader.style.display = 'none';
+
                 items.forEach(item => {
+                    // Only show folders, skip hidden files
                     if (item.type === 'dir' && !item.name.startsWith('.')) {
                         const card = document.createElement('div');
                         card.className = 'game-card';
-                        // Use the exact folder name for the path to prevent 404s
+                        
+                        // Force standard pathing to index.html to prevent downloads
                         card.onclick = () => launchGame(item.name, `${item.name}/index.html`);
                         
                         card.innerHTML = `
                             <div class="placeholder-img"></div>
-                            <div class="game-label">${item.name.replace(/-/g, ' ')}</div>
+                            <div class="game-label">${item.name.replace(/-/g, ' ').replace(/_/g, ' ')}</div>
                         `;
                         grid.appendChild(card);
                     }
                 });
-            } catch (e) {
-                console.error("Failed to load games:", e);
+            } catch (err) {
+                loader.innerText = "Error: Nebula Signal Lost. Check your GitHub repository settings.";
+                console.error(err);
             }
         }
 
-        function launchGame(name, path) {
-            // Fix: Pointing to exact index.html prevents browser from downloading the folder
-            const gameUrl = window.location.origin + '/' + path;
-            
+        function launchGame(name, folderPath) {
             const win = window.open('about:blank', '_blank');
             if (!win) {
-                alert('Please allow popups for Aura Arcade!');
+                alert('Please allow popups to play games!');
                 return;
             }
 
+            // Set Title to specific game name
             win.document.title = name.toUpperCase();
+
             const iframe = win.document.createElement('iframe');
-            iframe.src = gameUrl;
-            iframe.style.cssText = "position:fixed; top:0; left:0; width:100vw; height:100vh; border:none; margin:0; padding:0;";
+            // Builds full URL using current domain
+            iframe.src = window.location.origin + '/' + folderPath;
+            iframe.style.cssText = "position:fixed; top:0; left:0; width:100vw; height:100vh; border:none; margin:0; padding:0; overflow:hidden;";
             
             win.document.body.style.margin = '0';
             win.document.body.appendChild(iframe);
         }
 
-        loadGames();
+        initArcade();
     </script>
 </body>
 </html>
