@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura Arcade</title>
+    <style>
+        :root {
+            --galaxy-green: #00ff88;
+            --deep-void: #020617;
+            --nebula-glow: rgba(0, 255, 136, 0.15);
+            --card-bg: rgba(255, 255, 255, 0.03);
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--deep-void);
+            color: #e2e8f0;
+            font-family: 'Inter', -apple-system, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated Green Nebula Background */
+        .background-fx {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 20% 30%, #064e3b 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, #064e3b 0%, transparent 40%);
+            filter: blur(80px);
+            opacity: 0.4;
+        }
+
+        header {
+            text-align: center;
+            padding: 80px 20px 40px;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin: 0;
+            letter-spacing: -1px;
+            background: linear-gradient(to bottom right, #fff, var(--galaxy-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 15px rgba(0, 255, 136, 0.4));
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            margin-top: 10px;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Square Grid */
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 25px;
+            width: 90%;
+            max-width: 1100px;
+            padding: 40px 0 100px;
+        }
+
+        /* Square Card Styling */
+        .game-card {
+            aspect-ratio: 1 / 1;
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .game-card:hover {
+            transform: scale(1.03);
+            border-color: var(--galaxy-green);
+            box-shadow: 0 0 40px var(--nebula-glow);
+        }
+
+        /* Solid Green Placeholder */
+        .placeholder-img {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #064e3b; /* Dark Green Base */
+            background-image: linear-gradient(135deg, #065f46 25%, transparent 25%), 
+                              linear-gradient(225deg, #065f46 25%, transparent 25%);
+            background-size: 40px 40px;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+        }
+
+        .game-card:hover .placeholder-img {
+            opacity: 0.9;
+            background-color: #059669; /* Brighter Green on hover */
+        }
+
+        .game-label {
+            z-index: 2;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(8px);
+            padding: 18px;
+            text-align: center;
+            font-weight: 600;
+            border-top: 1px solid rgba(0, 255, 136, 0.2);
+            color: var(--galaxy-green);
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-fx"></div>
+
+    <header>
+        <h1>Aura Arcade</h1>
+        <p class="subtitle">Galaxy Gaming Portal</p>
+    </header>
+
+    <main class="game-grid">
+        <!-- GAME 1: 1v1.lol -->
+        <div class="game-card" onclick="launchGame('1v1.lol', '1v1.lol/')">
+            <div class="placeholder-img"></div>
+            <div class="game-label">1v1.lol</div>
+        </div>
+
+        <!-- GAME 2: BitLife -->
+        <div class="game-card" onclick="launchGame('BitLife', 'bitlife/')">
+            <div class="placeholder-img"></div>
+            <div class="game-label">BitLife</div>
+        </div>
+
+        <!-- GAME 3: Cookie Clicker -->
+        <div class="game-card" onclick="launchGame('Cookie Clicker', 'cookieclicker/')">
+            <div class="placeholder-img"></div>
+            <div class="game-label">Cookie Clicker</div>
+        </div>
+
+        <!-- GAME 4: Slope -->
+        <div class="game-card" onclick="launchGame('Slope', 'slope/')">
+            <div class="placeholder-img"></div>
+            <div class="game-label">Slope</div>
+        </div>
+
+        <!-- Add more cards following the same pattern for other folders -->
+    </main>
+
+    <script>
+        function launchGame(name, folderPath) {
+            // Create a new window
+            const win = window.open('about:blank', '_blank');
+            if (!win) {
+                alert('Please allow popups to play games!');
+                return;
+            }
+
+            // Set the Tab title to the Game Name
+            win.document.title = name;
+            win.document.body.style.margin = '0';
+            win.document.body.style.padding = '0';
+            win.document.body.style.overflow = 'hidden';
+
+            // Create and inject the fullscreen iframe
+            const iframe = win.document.createElement('iframe');
+            iframe.style.width = '100vw';
+            iframe.style.height = '100vh';
+            iframe.style.border = 'none';
+            iframe.style.margin = '0';
+            
+            // Build the URL based on the current origin
+            iframe.src = window.location.origin + '/' + folderPath;
+
+            win.document.body.appendChild(iframe);
+        }
+    </script>
+</body>
+</html>
