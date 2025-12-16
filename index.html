@@ -79,7 +79,6 @@
     <main class="game-grid" id="grid"></main>
 
     <script>
-        // CONFIG: The list of games provided by the user.
         const gameList = [
             '1v1.lol', '2048', 'Agar.io', 'Bacon May Die', 'Basket Random', 'Basketball Stars',
             'Bitlife', 'Deadly Descent', 'Deepest Sword', 'Draw Climber', 'Drift Boss',
@@ -90,49 +89,43 @@
             'Snow Rider 3D', 'Snowball.io', 'Space Waves', 'Subway Surfers', 'Tomb of the Mask'
         ];
 
-        async function initArcade() {
+        function initArcade() {
             const grid = document.getElementById('grid');
             const loader = document.getElementById('loading');
             
-            try {
-                loader.style.display = 'none';
+            loader.style.display = 'none';
 
-                gameList.forEach(gameName => {
-                    const card = document.createElement('div');
-                    card.className = 'game-card';
-                    
-                    // The folder path uses the raw game name for the URL
-                    card.onclick = () => launchGame(gameName, `${gameName}/index.html`);
-                    
-                    // The display name cleans up dashes/underscores for readability
-                    const displayName = gameName.replace(/-/g, ' ').replace(/_/g, ' ');
+            gameList.forEach(gameName => {
+                const card = document.createElement('div');
+                card.className = 'game-card';
+                
+                // Pass the folder name directly
+                card.onclick = () => launchGame(gameName);
+                
+                const displayName = gameName.replace(/-/g, ' ').replace(/_/g, ' ');
 
-                    card.innerHTML = `
-                        <div class="placeholder-img"></div>
-                        <div class="game-label">${displayName}</div>
-                    `;
-                    grid.appendChild(card);
-                });
-            } catch (err) {
-                // This catch block might only trigger if the gameList itself is invalid now
-                loader.innerText = "Error: Nebula Signal Lost. Check your game list configuration.";
-                console.error(err);
-            }
+                card.innerHTML = `
+                    <div class="placeholder-img"></div>
+                    <div class="game-label">${displayName}</div>
+                `;
+                grid.appendChild(card);
+            });
         }
 
-        function launchGame(name, folderPath) {
+        function launchGame(folderName) {
             const win = window.open('about:blank', '_blank');
             if (!win) {
                 alert('Please allow popups to play games!');
                 return;
             }
 
-            // Set Title to specific game name
-            win.document.title = name.toUpperCase();
+            win.document.title = folderName.toUpperCase();
 
             const iframe = win.document.createElement('iframe');
-            // Builds full URL using current domain
-            iframe.src = window.location.origin + '/' + folderPath;
+            
+            // Build absolute URL. Adding the trailing slash / is critical for Vercel
+            iframe.src = window.location.origin + '/' + folderName + '/';
+            
             iframe.style.cssText = "position:fixed; top:0; left:0; width:100vw; height:100vh; border:none; margin:0; padding:0; overflow:hidden;";
             
             win.document.body.style.margin = '0';
