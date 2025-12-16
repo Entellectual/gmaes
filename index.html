@@ -79,41 +79,43 @@
     <main class="game-grid" id="grid"></main>
 
     <script>
-        // CONFIG: Replace with your details if they change
-        const REPO_OWNER = 'Entellectual';
-        const REPO_NAME = 'gmaes';
+        // CONFIG: The list of games provided by the user.
+        const gameList = [
+            '1v1.lol', '2048', 'Agar.io', 'Bacon May Die', 'Basket Random', 'Basketball Stars',
+            'Bitlife', 'Deadly Descent', 'Deepest Sword', 'Draw Climber', 'Drift Boss',
+            'Drift Hunters', 'Drive Mad', 'Escape Road', 'FNAF', 'GTA 2', 'Geometry Dash',
+            'Gran Turismo', 'Gun Mayhem', 'Happy Wheels', 'Level Devil', 'Madalin Stunt Cars 2',
+            'Minecraft 1.8', 'Monkey Mart', 'MotoX3M', 'Paper.io', 'Pixel Shooter',
+            'Polytrack', 'Retro Bowl', 'Retro Bowl College', 'Slither.io', 'Slope',
+            'Snow Rider 3D', 'Snowball.io', 'Space Waves', 'Subway Surfers', 'Tomb of the Mask'
+        ];
 
         async function initArcade() {
             const grid = document.getElementById('grid');
             const loader = document.getElementById('loading');
             
             try {
-                // Fetch repository contents via GitHub API
-                const response = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/`);
-                const items = await response.json();
-
-                if (!Array.isArray(items)) throw new Error('Invalid repo data');
-
                 loader.style.display = 'none';
 
-                items.forEach(item => {
-                    // Only show folders, skip hidden files
-                    if (item.type === 'dir' && !item.name.startsWith('.')) {
-                        const card = document.createElement('div');
-                        card.className = 'game-card';
-                        
-                        // Force standard pathing to index.html to prevent downloads
-                        card.onclick = () => launchGame(item.name, `${item.name}/index.html`);
-                        
-                        card.innerHTML = `
-                            <div class="placeholder-img"></div>
-                            <div class="game-label">${item.name.replace(/-/g, ' ').replace(/_/g, ' ')}</div>
-                        `;
-                        grid.appendChild(card);
-                    }
+                gameList.forEach(gameName => {
+                    const card = document.createElement('div');
+                    card.className = 'game-card';
+                    
+                    // The folder path uses the raw game name for the URL
+                    card.onclick = () => launchGame(gameName, `${gameName}/index.html`);
+                    
+                    // The display name cleans up dashes/underscores for readability
+                    const displayName = gameName.replace(/-/g, ' ').replace(/_/g, ' ');
+
+                    card.innerHTML = `
+                        <div class="placeholder-img"></div>
+                        <div class="game-label">${displayName}</div>
+                    `;
+                    grid.appendChild(card);
                 });
             } catch (err) {
-                loader.innerText = "Error: Nebula Signal Lost. Check your GitHub repository settings.";
+                // This catch block might only trigger if the gameList itself is invalid now
+                loader.innerText = "Error: Nebula Signal Lost. Check your game list configuration.";
                 console.error(err);
             }
         }
