@@ -92,14 +92,11 @@
         function initArcade() {
             const grid = document.getElementById('grid');
             const loader = document.getElementById('loading');
-            
             loader.style.display = 'none';
 
             gameList.forEach(gameName => {
                 const card = document.createElement('div');
                 card.className = 'game-card';
-                
-                // Pass the folder name directly
                 card.onclick = () => launchGame(gameName);
                 
                 const displayName = gameName.replace(/-/g, ' ').replace(/_/g, ' ');
@@ -120,15 +117,19 @@
             }
 
             win.document.title = folderName.toUpperCase();
+            win.document.body.style.margin = '0';
+            win.document.body.style.padding = '0';
+            win.document.body.style.overflow = 'hidden';
+
+            // Create a base tag to ensure the game finds its local CSS/JS/Images
+            const base = win.document.createElement('base');
+            base.href = window.location.origin + '/' + folderName + '/';
+            win.document.head.appendChild(base);
 
             const iframe = win.document.createElement('iframe');
+            iframe.src = window.location.origin + '/' + folderName + '/index.html';
+            iframe.style.cssText = "position:fixed; top:0; left:0; width:100vw; height:100vh; border:none; margin:0; padding:0;";
             
-            // Build absolute URL. Adding the trailing slash / is critical for Vercel
-            iframe.src = window.location.origin + '/' + folderName + '/';
-            
-            iframe.style.cssText = "position:fixed; top:0; left:0; width:100vw; height:100vh; border:none; margin:0; padding:0; overflow:hidden;";
-            
-            win.document.body.style.margin = '0';
             win.document.body.appendChild(iframe);
         }
 
